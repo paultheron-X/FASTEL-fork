@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>FASTEL Documentation</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> FASTEL Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#introduction-to-differentiable-tree-ensembles">Introduction to differentiable tree ensembles</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#differentiable-decision-trees">Differentiable decision trees</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#routing">Routing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#prediction">Prediction</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#conclusion">Conclusion</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="fastel/">FASTEL</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="tutorial/">Tutorial</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">FASTEL Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="flexible-modeling-and-multitask-learning-using-differentiable-tree-ensembles">Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles</h1>
+<p><strong> Authors: Shibal Ibrahim, Hussein Hazimeh, Rahul Mazumder </strong></p>
+<p>This site provides an introduction to FASTEL, a new toolkit for learning differentiable tree ensembles (2022, Ibrahim, Hazimeh and Mazumder). An introduction to differentiable tree ensembles can be found below. To dive in, a code tutorial can be found in the <a href="tutorial/">Tutorial Section</a>. </p>
+<p>Our contributions, which can be summarized as follows, are:</p>
+<ul>
+<li>Proposition of a flexible framework for training differentiable tree ensembles with seamless support for new loss functions.</li>
+<li>Introduction of a novel, tensor-based formulation for differentiable tree ensembles that allows for efficient training on GPUs.</li>
+<li>Extension of differentiable tree ensembles to multi-task learning settings by introducing a new regularizer that allows for soft parameter sharing across tasks.</li>
+<li>Introduction of FASTEL — a new toolkit (based on Tensorflow 2.0) for learning differentiable tree ensembles</li>
+</ul>
+<p>To have more details about our countributions, please visit <a href="fastel/">Fastel</a>. </p>
+<h2 id="introduction-to-differentiable-tree-ensembles">Introduction to differentiable tree ensembles</h2>
+<p>We learn an ensemble of m differentiable trees. Let  <span class="arithmatex">\(f^j\)</span> be the <span class="arithmatex">\(j\)</span> th tree in the ensemble. For easier exposition, we consider a single-task regression or classification setting—see Section 5 for an extension to the multi-task setting. In a regression setting <span class="arithmatex">\(k=1\)</span>, while in multi-class classification setting <span class="arithmatex">\(k = C\)</span>, where <span class="arithmatex">\(C\)</span> is the number of classes. For an input feature-vector <span class="arithmatex">\(x \in \mathbb{R}^p\)</span> , we learn an additive model with the output being sum over outputs of all the trees:</p>
+<div class="arithmatex">\[\begin{equation}
+f(x) = \sum_{j=1}^m f^j(x)
+\end{equation}\]</div>
+<p>The output, <span class="arithmatex">\(f(x)\)</span>, is a vector in <span class="arithmatex">\(\mathbb{R}^k\)</span> containing raw predictions. For multiclass classification, mapping from raw predictions to <span class="arithmatex">\(Y\)</span> is done by applying a softmax function on the vector <span class="arithmatex">\(f (x )\)</span> and returning the class with the highest probability. Next, we introduce the key building block of the approach: differentiable decision tree.</p>
+<h5 id="differentiable-decision-trees">Differentiable decision trees</h5>
+<p>Classical decision trees perform hard sample routing, i.e., a sample is routed to exactly one child at every splitting node. Hard sample routing introduces discontinuities in the loss function, making trees unamenable to continuous optimization. Therefore, trees are usually built in a greedy fashion. In this section, we first introduce a single soft tree and extended to soft tree ensembles. A soft tree is a variant of a decision tree that performs soft routing, where every internal node can route the sample to the left and right simultaneously, with different proportions. This routing mechanism makes soft trees differentiable, so learning can be done using gradient-based methods.
+Let us fix some <span class="arithmatex">\(j \in [m]\)</span> and consider a single tree <span class="arithmatex">\(f^j\)</span> in the additive model. Recall that <span class="arithmatex">\(f^j\)</span> takes an input sample and returns an output vector (logit), i.e., <span class="arithmatex">\(f^j : X ∈ \mathbb{R}^p → \mathbb{R}^k\)</span> . Moreover, we assume that <span class="arithmatex">\(f^j\)</span> is a perfect binary tree with depth <span class="arithmatex">\(d\)</span>. We use the sets <span class="arithmatex">\(\mathcal{I}^j\)</span> and <span class="arithmatex">\(\mathcal{J}^j\)</span> to denote the internal (split) nodes and the leaves of the tree, respectively. For any node  <span class="arithmatex">\(i \in \mathcal{I}^j \cup \mathcal{J}^j\)</span> , we define <span class="arithmatex">\(A^j(i)\)</span> as its set of ancestors and use the notation <span class="arithmatex">\(x → i\)</span> for the event that a sample <span class="arithmatex">\(x \in \mathbb{R}^p\)</span> reaches <span class="arithmatex">\(i\)</span>.</p>
+<h5 id="routing">Routing</h5>
+<p>Internal (split) nodes in a differentiable tree perform soft routing, where a sample is routed left and right with different proportions. This soft routing can be viewed as a probabilistic model. Although the sample routing is formulated with a probabilistic model, the final prediction of the tree <span class="arithmatex">\(f\)</span> is a deterministic function as it assumes an expectation over the leaf predictions. Classical decision trees are modeled with either axis-aligned splits
+or hyperplane (a.k.a. oblique) splits. Soft trees are based on hyperplane splits, where the routing decisions rely on a linear combination of the features. Particularly, each internal node <span class="arithmatex">\(i \in \mathcal{I}^j\)</span> is associated with a trainable weight vector <span class="arithmatex">\(w_i^j \in \mathbb{R}^p\)</span> that defines the node’s hyperplane split. Given a sample <span class="arithmatex">\(x \in \mathbb{R}^p\)</span> , the probability that internal node i routes <span class="arithmatex">\(x\)</span> to the left is defined by <span class="arithmatex">\(S(w_i^j ·x)\)</span>,where <span class="arithmatex">\(S : \mathbb{R} → [0, 1]\)</span> is an activation function. Now we discuss how to model the probability that <span class="arithmatex">\(x\)</span> reaches a certain leaf <span class="arithmatex">\(l\)</span>. Let <span class="arithmatex">\([l \swarrow i]\)</span> (resp. <span class="arithmatex">\([i \searrow l]\)</span>) denote the event that leaf <span class="arithmatex">\(l\)</span> belongs to the left (resp. right) subtree of node <span class="arithmatex">\(i \in \mathcal{I}^j\)</span>. Assuming that the routing decision made at each internal node in the tree is independent of the other nodes, the probability that x reaches l is given by:</p>
+<div class="arithmatex">\[\begin{equation}
+P^j(\{x → l\}) = \prod_{i \in A^j(l)} r_{i,l}^j(x)
+\end{equation}\]</div>
+<p>where <span class="arithmatex">\(r_{i,l}^j(x) = S(w_i^j ·x)1[l \swarrow i]\bigodot(1 − S(w_i^j ·x))1[i \searrow l]\)</span>. The probability of node <span class="arithmatex">\(i\)</span> routing <span class="arithmatex">\(x\)</span> toward the subtree containing leaf l.
+Popular choices for <span class="arithmatex">\(S\)</span> include logistic function and smooth-step function (for conditional computation as in classical trees with oblique splits). </p>
+<h4 id="prediction">Prediction</h4>
+<p>As with classical decision trees, we assume that each leaf stores a weight vector <span class="arithmatex">\(o_l^j \in \mathbb{R}^k\)</span> (learned during training). Note <span class="arithmatex">\(j\)</span> that, during the forward pass, <span class="arithmatex">\(o_l^j\)</span> is a constant vector, meaning that it is not a function of the input sample(s). For a sample <span class="arithmatex">\(x \in \mathbb{R}^p\)</span> , we define the prediction of the tree as the expected value of the leaf outputs, i.e.,</p>
+<div class="arithmatex">\[\begin{equation}
+f^j(x) = \sum_{l \in L} P^j(\{x → l\}) o_l^j
+\end{equation}\]</div>
+<p>where <span class="arithmatex">\(L\)</span> is the set of leaves in the tree</p>
+<h4 id="conclusion">Conclusion</h4>
+<p>End-to-end learning with differentiable tree ensembles appears to have several advantages. </p>
+<ol>
+<li>Training is easy to set up in public deep learning frameworks. Differentiable tree ensembles allow for flexibility in loss functions without the need for specialized algorithms. For example, mixture likelihoods can be easily implemented in Tensorflow Probability, which allows for handling zero-inflated data. Similarly, multi-task loss objectives can also be handled. </li>
+<li>With a careful implementation, the tree ensemble can be trained efficiently on GPUs — this is not possible with earlier toolkits such as TEL.</li>
+<li>Differentiable trees can lead to more expressive and compact ensembles. This can have important implications for interpretability, latency and storage requirements during inference.</li>
+</ol>
+<p>This is the framework implemented in the FASTEL package. To see it in action, the tutorial can be found <a href="tutorial/">here</a>. </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="fastel/" class="btn btn-neutral float-right" title="FASTEL">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+    
+      <span><a href="fastel/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="javascripts/config.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2022-09-12 15:56:07.316643+00:00
+-->

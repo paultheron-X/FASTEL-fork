@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>FASTEL - FASTEL Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "FASTEL";
+        var mkdocs_page_input_path = "fastel.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/rust.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> FASTEL Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">FASTEL</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#efficient-tensor-formulation">Efficient tensor formulation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#flexible-loss-functions">Flexible loss functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multi-task-learning-with-tree-ensembles">Multi-task learning with tree ensembles</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#results">Results</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../tutorial/">Tutorial</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">FASTEL Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>FASTEL</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="fastel">FASTEL</h1>
+<p>On this page, we describe the main findings in Ibrahim, Hazimeh and Mazumder, 2022.</p>
+<p>Our contributions can be summarized as follows:</p>
+<ul>
+<li>Proposition of a flexible framework for training differentiable tree ensembles with seamless support for new loss functions.</li>
+<li>Introduction of a novel, tensor-based formulation for differentiable tree ensembles that allows for efficient training on GPUs.</li>
+<li>Extension of differentiable tree ensembles to multi-task learning settings by introducing a new regularizer that allows for soft parameter sharing across tasks.</li>
+<li>Introduction of FASTEL — a new toolkit (based on Tensorflow 2.0) for learning differentiable tree ensembles</li>
+</ul>
+<p>The code for FASTEL is available <a href="https://github.com/ShibalIbrahim/FASTEL">here</a>. </p>
+<h3 id="efficient-tensor-formulation">Efficient tensor formulation</h3>
+<p>Current differentiable tree ensemble proposals and toolkits, model trees individually. This leads to slow CPU-training times and makes these implementations hard to vectorize for fast GPU training.</p>
+<p>In that context, we propose to model the internal nodes in the trees across the ensemble jointly as a “supernodes”. In particular, an internal node <span class="arithmatex">\(i \in \mathcal{I}^j\)</span> at depth <span class="arithmatex">\(d\)</span> in all trees can be condensed together into a supernode $i\in \mathcal{I}. We define a learnable weight matrix <span class="arithmatex">\(W_i \in \mathbb{R}^{p,m}\)</span>, where each <span class="arithmatex">\(j\)</span>-th column of the weight matrix contains the learnable weight vector <span class="arithmatex">\(w_i^j\)</span> of the original <span class="arithmatex">\(j\)</span>-th tree in the ensemble. Similarly, the leaf nodes are defined to store a learnable weight matrix <span class="arithmatex">\(O_l \in \mathbb{R}^{m,k}\)</span> , where each <span class="arithmatex">\(j\)</span>-th row contains the learnable weight vector <span class="arithmatex">\(o_l^j\)</span> in the original <span class="arithmatex">\(j\)</span>-th tree in the ensemble. The prediction of the tree with supernodes can be written as</p>
+<div class="arithmatex">\[\begin{equation}
+f(x) = (\sum_{l \in \mathcal{L}}O_l \bigodot \prod_{i \in A(l)}R_{i,l}) · 1_m
+\end{equation}\]</div>
+<p>where <span class="arithmatex">\(\bigdot\)</span> denotes the element-wise product, <span class="arithmatex">\(R_{i,l}= S(W_i ·x)1[l \swarrow i]\bigodot(1 − S(W_i ·x))1[i \searrow l] \in \mathbb{R}^{m,l}\)</span> and the activation function <span class="arithmatex">\(S\)</span> is applied element-wise. This formulation of tree ensembles via supernodes allows for sharing of information across tasks via tensor formulation in multi-task learning.</p>
+<figure align="middle">
+  <img src="img/fastel/efficientvector.png" width="700" />
+  <figcaption> <span style="font-size:0.7em;">Timing comparison of classical formulation against our tensor-based formulation of a tree ensemble. Tensor-based formulation with CPU training is up to 10× faster than classical formulation. Tensor-based formulation with GPU training leads to an additional 40% improvement, leading to an effec- tive 20× gain over classical formulation.</span>  </figcaption>
+</figure>
+
+<h3 id="flexible-loss-functions">Flexible loss functions</h3>
+<p>Our framework can handle any differentiable loss function. Such flexibility is important as various applications require flexibility in loss functions beyond what is provided by current tree ensemble learning toolkits. Our framework is built on Tensorflow, which allows for scalable gradient-based optimization. This coupled with our efficient differentiable tree ensemble formulation gives a powerful toolkit to seamlessly experiment with different loss functions and select what is suitable for the intended application. A few examples of flexible distributions that our toolkit supports — due to compatibility with Tensorflow-Probability — are normal, Poisson, gamma, exponential, mixture distributions e.g., zero-inflation models, and compound distributions e.g., negative binomial. Other loss functions such as those robust to outliers can also be handled.</p>
+<h3 id="multi-task-learning-with-tree-ensembles">Multi-task learning with tree ensembles</h3>
+<p>Multi-task Learning (MTL) aims to learn multiple tasks simultaneously by using a shared model. Unlike single task learning, MTL can achieve better generalization performance through exploiting task relationships. One key problem in MTL is how to share model parameters between tasks. For instance, sharing parameters between unrelated tasks can potentially degrade performance. MTL approaches for classical decision trees approaches e.g., RF, GRF have shared weights at the splitting nodes across the tasks. Only the leaf weights are task specific. However this can be limiting in terms of performance, despite easier interpretability associated with the same split nodes across tasks.</p>
+<p>To perform flexible multi-task learning, we extend our formulation from <a href="#efficient-tensor-formulation">here</a> by using task-specific nodes in the tree ensemble. We consider <span class="arithmatex">\(T\)</span> tasks. For easier exposition, we consider tasks of the same kind: multilabel classification or multi-task regression. For multilabel classification, each task is assumed to have same number of classes (with <span class="arithmatex">\(k = C\)</span>) for easier exposition — our framework can handle multilabel settings with different number of classes per task. Similarly, for regression settings, <span class="arithmatex">\(k = 1\)</span>. For multi-task zero-inflated Poisson or negative binomial regression, when two model components need to be estimated, we set <span class="arithmatex">\(k = 2\)</span> to predict log-mean and logit components for zero-inflated Poisson and log-mean and log-dispersion components for negative binomial.</p>
+<p>We define a trainable weight tensor <span class="arithmatex">\(\mathcal{W}_i \in \mathbb{R}^{T,p,m}\)</span> for supernode <span class="arithmatex">\(i \in \mathcal{I}\)</span>, where each <span class="arithmatex">\(t\)</span>-th slice of the tensor <span class="arithmatex">\(\mathcal{W}_i[t, :, :]\)</span> denotes the trainable weight matrix associated with task <span class="arithmatex">\(t\)</span>. The prediction in this case is given by</p>
+<div class="arithmatex">\[\begin{equation}
+\begin{equation}
+f(x) = (\sum_{l \in L}\mathcal{O}_l \bigodot \prod_{i \in A(l)}\mathcal{R}_{i,l}) · 1_m
+\end{equation}\]</div>
+<p>where <span class="arithmatex">\(\mathcal{O} \in \mathbb{R}^{T,m,k}\)</span> denotes the trainable leaf tensor in leaf l, <span class="arithmatex">\(R_{i,l}= S(\mathcal{W}_i ·x)1[l \swarrow i]\bigodot(1 − S(\mathcal{W}_i ·x))1[i \searrow l] \in \mathbb{R}^{m,l,1}\)</span>, and the activation function <span class="arithmatex">\(S\)</span> is applied element-wise. This formulation of tree ensembles via supernodes allows for sharing of information across tasks via tensor formulation in multi-task learning.</p>
+<p>In order to share information across the tasks, our framework imposes a closeness penalty on the hyperplanes <span class="arithmatex">\(\mathcal{W}_i\)</span> in the supernodes across the tasks. This results in the optimization formulation:</p>
+<p>TO BE ADDED WITH RAW LATEX</p>
+<p>where <span class="arithmatex">\(W \in RI,T,m,p\)</span> denotes all the weights in all the supernodes, <span class="arithmatex">\(O ∈ RL,m,k\)</span> denotes all the weights in the leaves, and <span class="arithmatex">\(λ ∈ [0, ∞)\)</span> is a non-negative regularization penalty that controls how close the weights across the tasks are. For <span class="arithmatex">\(λ = 0\)</span>, the model behaves similar to a single-task learning setting. When <span class="arithmatex">\(λ → ∞\)</span>, the model shares complete information in the splitting nodes and the weights across the tasks in each of the internal supernodes become the same — this is similar to hard parameter sharing. The latter case can be separately handled more efficiently by using the function definition for <span class="arithmatex">\(f (x )\)</span> without any closeness regularization. Our model can control the level of sharing across the tasks by controlling <span class="arithmatex">\(λ\)</span>. In practice, we tune over <span class="arithmatex">\(λ ∈ [1e − 5, 10]\)</span> and select the optimal value based on a validation set. This penalty assumes that the hyperplanes across the tasks should be equally close as we go down the depth of the trees. However this assumption maybe less accurate as we go down the tree. Empirically, we found that decaying <span class="arithmatex">\(λ\)</span> exponentially as <span class="arithmatex">\(λ/2d\)</span> with depth <span class="arithmatex">\(d\)</span> of the supernodes in the ensemble can achieve better test performance.</p>
+<h3 id="results">Results</h3>
+<p>TO BE COMPLETED WITH raw latex tables </p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../tutorial/" class="btn btn-neutral float-right" title="Tutorial">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../tutorial/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../javascripts/config.js" defer></script>
+      <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
+      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

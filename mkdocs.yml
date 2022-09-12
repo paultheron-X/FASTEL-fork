@@ -1,0 +1,31 @@
+site_name: FASTEL Documentation
+
+plugins:
+  - mkdocstrings
+
+theme: 
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+      - yaml
+      - rust
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - attr_list
+  - def_list
+  - pymdownx.highlight:
+      use_pygments: false
+
+extra_javascript:
+  - javascripts/config.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+    - Home: 'index.md'
+    - FASTEL: 'fastel.md'
+    - Tutorial: 'tutorial.md'

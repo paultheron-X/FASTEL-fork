@@ -21,7 +21,7 @@ To tackle that problem, we introduce the concept of soft tree, which can be exte
 A soft tree is a variant of a decision tree that performs soft routing, where every internal node can route the sample to the left and right simultaneously, with different proportions. This routing mechanism makes soft trees differentiable, so learning can be done using gradient-based methods.
 
 <figure align="middle">
-  <img src="../img/index/classicvssofttree.png" width="700" />
+  <img src="img/index/classicvssofttree.png" width="700" />
   <figcaption> <span style="font-size:0.7em;">
   Comparison of soft tree vs. classic tree routing methods. On the classic tree a sample is routed to exactly one child at every splitting node, on the other side, a sample is routed to the left and right simultaneously, with different proportions, given a logistic function S </span>
   </span>  
@@ -53,7 +53,7 @@ f^j(x) = \sum_{l \in L} P^j(\{x → l\}) o_l^j
 where $L$ is the set of leaves in the tree
 
 <figure align="middle">
-  <img src="../img/index/results.png" width="700" />
+  <img src="img/index/results.png" width="700" />
   <figcaption> <span style="font-size:0.7em;"> </span>
   </span>  
   

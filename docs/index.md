@@ -1,70 +1,148 @@
 # Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles
-** Authors: Shibal Ibrahim, Hussein Hazimeh, Rahul Mazumder **
+** Authors: Shibal Ibrahim, Hussein Hazimeh, Rahul Mazumder and Paul Theron **
 
-This site provides an introduction to FASTEL, a new toolkit for learning differentiable tree ensembles [(2022, Ibrahim, Hazimeh and Mazumder)](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412). An introduction to differentiable tree ensembles can be found below. To dive in, a code tutorial can be found in the [Tutorial Section](tutorial.md). 
+This site provides an introduction to FASTEL, a new toolkit for learning differentiable tree ensembles [(2022, Ibrahim, Hazimeh and Mazumder)](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412). An overview of the theory can be foun [here](background.md) . To dive in, a code tutorial can be found below.
 
-Our contributions, which can be summarized as follows, are:
-
-   - Proposition of a flexible framework for training differentiable tree ensembles with seamless support for new loss functions.
-   - Introduction of a novel, tensor-based formulation for differentiable tree ensembles that allows for efficient training on GPUs.
-   - Extension of differentiable tree ensembles to multi-task learning settings by introducing a new regularizer that allows for soft parameter sharing across tasks.
-   - Introduction of FASTEL — a new toolkit (based on Tensorflow 2.0) for learning differentiable tree ensembles
-
-To have more details about our countributions, please visit [Fastel](fastel.md). 
-
-## Introduction to differentiable tree ensembles
-
-### Differentiable decision trees
-
-Classical decision trees perform hard sample routing, i.e., a sample is routed to exactly one child at every splitting node. Hard sample routing introduces discontinuities in the loss function, making trees unamenable to continuous optimization. Therefore, trees are usually built in a greedy fashion. 
-To tackle that problem, we introduce the concept of soft tree, which can be extended to soft tree ensembles. 
-A soft tree is a variant of a decision tree that performs soft routing, where every internal node can route the sample to the left and right simultaneously, with different proportions. This routing mechanism makes soft trees differentiable, so learning can be done using gradient-based methods.
-
-<figure align="middle">
-  <img src="img/index/classicvssofttree.png" width="700" />
-  <figcaption> <span style="font-size:0.7em;">
-  Comparison of soft tree vs. classic tree routing methods. On the classic tree a sample is routed to exactly one child at every splitting node, on the other side, a sample is routed to the left and right simultaneously, with different proportions, given a logistic function S </span>
-  </span>  
-  
-  </figcaption>
-</figure>
-
-Internal (split) nodes in a differentiable tree perform soft routing, where a sample is routed left and right with different proportions. Although the sample routing is formulated with a probabilistic model, the final prediction of the tree $f$ is a deterministic function as it assumes an expectation over the leaf predictions. Classical decision trees are modeled with either axis-aligned splits or hyperplane (a.k.a. oblique) splits. Soft trees are based on hyperplane splits, where the routing decisions rely on a linear combination of the features. Particularly, each internal node $i \in \mathcal{I}^j$ is associated with a trainable weight vector $w_i^j \in \mathbb{R}^p$ that defines the node’s hyperplane split. Given a sample $x \in \mathbb{R}^p$ , the probability that internal node i routes $x$ to the left is defined by $S(w_i^j ·x)$,where $S : \mathbb{R} → [0, 1]$ is an activation function. Popular choices for $S$ include logistic function and smooth-step function (for conditional computation as in classical trees with oblique splits). 
-
-### Differentiable tree ensembles
-
-We learn an ensemble of m differentiable trees. Let  $f^j$ be the $j$ th tree in the ensemble. For easier exposition, we consider a single-task regression.
-For an input feature-vector $x \in \mathbb{R}^p$ , we learn an additive model with the output being sum over outputs of all the trees:
-
-\begin{equation}
-f(x) = \sum_{j=1}^m f^j(x)
-\end{equation}
-
-The output, $f(x)$, is a vector in $\mathbb{R}^k$ containing raw predictions. For multiclass classification, mapping from raw predictions to $Y$ is done by applying a softmax function on the vector $f (x )$ and returning the class with the highest probability.
+This site provides an introduction to FASTEL (Flexible and Scalable Tree Ensemble Learning), a flexible and scalable toolkit for learning tree ensembles. We introduce a novel, tensor-based formulation for differentiable tree ensembles that allows for efficient training on GPUs.  We extend differentiable tree ensembles to multi-task learning settings by introducing a new regularizer that allows for soft parameter sharing across tasks. Our framework can lead to 100x more compact ensembles and up to 23% improvement in out-of-sample performance, compared to tree ensembles learnt by popular toolkits such as XGBoost. See our paper [Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles](https://arxiv.org/abs/2205.09717) appearing in 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining 2022 for details. An overview of the theory can be found [here](background.md) . To dive in, a code tutorial can be found below.
 
 
-### Predictions
-As with classical decision trees, we can assume that each leaf stores a weight vector $o_l^j \in \mathbb{R}^k$ (learned during training). Therefore, for a sample $x \in \mathbb{R}^p$ , the prediction of the tree can be defined as the expected value of the leaf outputs, i.e.,
+All code in the following tutorial, as well as further extensions, can be found on [Github](https://github.com/ShibalIbrahim/FASTEL).
 
-\begin{equation}
-f^j(x) = \sum_{l \in L} P^j(\{x → l\}) o_l^j
-\end{equation}
+# Tutorial
 
-where $L$ is the set of leaves in the tree
+## Installation
+FASTEL is written in Tensorflow 2.4. It uses Tensorflow-Probability (0.12) internally (for flexibility in modeling to support zero-inflation, negative binomial regression loss functions). Before installing FASTEL, please make sure that Tensorflow-GPU 2 and Tensorflow-Probability are installed.
 
-<figure align="middle">
-  <img src="img/index/results.png" width="700" />
-  <figcaption> <span style="font-size:0.7em;"> </span>
-  </span>  
-  
-  </figcaption>
-</figure>
+## Support
+The toolkit supports the following features:
 
-### Conclusion
-End-to-end learning with differentiable tree ensembles appears to have several advantages. 
+1. singletask and multitask regression
+2. missing responses
+3. zero-inflated-poisson
+4. negative binomial regression
+5. GPU training
 
- 1. Training is easy to set up in public deep learning frameworks. Differentiable tree ensembles allow for flexibility in loss functions without the need for specialized algorithms. For example, mixture likelihoods can be easily implemented in Tensorflow Probability, which allows for handling zero-inflated data. Similarly, multi-task loss objectives can also be handled. 
- 2. With a careful implementation, the tree ensemble can be trained efficiently on GPUs — this is not possible with earlier toolkits such as TEL.
- 3. Differentiable trees can lead to more expressive and compact ensembles. This can have important implications for interpretability, latency and storage requirements during inference.
+## Loading Dependencies
+First, we load in all third-party packages. 
 
-This is the framework implemented in the FASTEL package. To see it in action, the tutorial can be found [here](tutorial.md). 
+```python
+%matplotlib inline
+import os
+import pandas as pd, numpy as np, s3fs, matplotlib.pyplot as plt
+import seaborn as sns
+import timeit
+import joblib
+from copy import deepcopy
+import seaborn as sb
+import pandas as pd
+import time
+import pathlib
+import argparse
+```
+
+Then, we load in all custom packages. 
+    
+```python
+import data_utils
+import engine
+```
+
+## Initialize parameters
+We define all default arguments for the fastel method. 
+
+```python
+
+parser = argparse.ArgumentParser(description='Multitask differentiable decision tree ensembles.')
+
+# Data Arguments
+parser.add_argument('--load_directory', dest='load_directory',  type=str, default='s3://cortex-mit1003-lmdl-workbucket/public-datasets-processed')
+parser.add_argument('--data', dest='data',  type=str, default='atp1d')
+parser.add_argument('--seed', dest='seed',  type=int, default=8)
+parser.add_argument('--val_size', dest='val_size',  type=float, default=0.2)
+parser.add_argument('--test_size', dest='test_size',  type=float, default=0.2)
+parser.add_argument('--missing_percentage', dest='missing_percentage',  type=float, default=0.0)
+
+# Model Arguments
+parser.add_argument('--trees', dest='trees',  type=int, default=20)
+parser.add_argument('--depth', dest='depth',  type=int, default=4)
+parser.add_argument('--activation', dest='activation',  type=str, default='sigmoid')
+parser.add_argument('--loss', dest='loss',  type=str, default='mse')
+parser.add_argument('--architecture', default='shared', type=str) # only matters for ZIP, NB losses.
+parser.add_argument('--model_type', default=None, type=str) # 'regularized' or None
+parser.add_argument('--alpha', dest='alpha', type=float, default=0.1) # for regularization
+parser.add_argument('--power', dest='power', type=float, default=1.0) # for regularization strength along depth
+
+# Algorithm Arguments
+parser.add_argument('--epochs', dest='epochs',  type=int, default=200)
+parser.add_argument('--batch_size', dest='batch_size',  type=int, default=64)
+parser.add_argument('--learning_rate', dest='learning_rate', type=float, default=0.01)
+parser.add_argument('--patience', dest='patience',  type=int, default=25)
+
+# Logging Arguments
+parser.add_argument('--version', dest='version',  type=int, default=1)
+parser.add_argument('--save_directory', dest='save_directory',  type=str, default='./runs/soft_trees/publicdata')
+
+args = parser.parse_args()
+
+# Saving path
+path = os.path.join(args.save_directory, args.data, "all-tasks", args.loss, "{}".format(args.version))
+os.makedirs(path, exist_ok=True)
+```
+
+## Data and Preprocessing
+ 
+``` python
+df_X, df_y, metadata = data_utils.load_multitask_public_data(
+    data=args.data,
+    path=args.load_directory,
+)
+data_processed = data_utils.load_processed_multitask_public_data(
+    df_X, df_y, metadata,
+    'all',
+    val_size=args.val_size,
+    test_size=args.test_size,
+    seed=args.seed,
+    missing_percentage=args.missing_percentage,    
+)
+```
+
+## Modeling with MultiTaskEngine
+We initialize the multitask engine with the parameters defined above. 
+
+```python
+fastel = engine.MultiTaskTrees(
+    data_processed.x_train_processed.shape[1:],
+    loss_criteria=args.loss,
+    architecture=args.architecture,
+    activation=args.activation,
+    num_trees=args.trees,
+    depth=args.depth,
+    num_tasks=data_processed.y_train_processed.shape[1],
+    model_type=args.model_type,
+    alpha=args.alpha,
+    power=args.power,
+    batch_size=args.batch_size,
+    learning_rate=args.learning_rate,
+    epochs=args.epochs,
+)
+
+fastel.train(
+    data_processed.x_train_processed,
+    data_processed.y_train_processed,
+    data_processed.w_train,
+    data_processed.x_valid_processed,
+    data_processed.y_valid_processed,
+    data_processed.w_valid
+)
+```
+
+## Evaluation
+
+```python
+metrics_valid = fastel.evaluate(data_processed.x_valid_processed, data_processed.y_valid_processed, data_processed.w_valid)
+metrics_test = fastel.evaluate(data_processed.x_test_processed, data_processed.y_test_processed, data_processed.w_test)
+print("\n============Validation Metrics =================")
+print(metrics_valid)
+print("\n============Test Metrics =================")
+print(metrics_test)
+```

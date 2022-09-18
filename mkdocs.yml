@@ -27,5 +27,4 @@ extra_javascript:
 
 nav:
     - Home: 'index.md'
-    - FASTEL: 'fastel.md'
-    - Tutorial: 'tutorial.md'
+    - Contributions: 'background.md'

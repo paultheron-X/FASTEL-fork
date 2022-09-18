@@ -4,23 +4,23 @@
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <link rel="shortcut icon" href="../img/favicon.ico" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
     <title>Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles - FASTEL Documentation</title>
-    <link rel="stylesheet" href="../css/theme.css" />
-    <link rel="stylesheet" href="../css/theme_extra.css" />
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
-        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+        <link href="../../assets/_mkdocstrings.css" rel="stylesheet" />
     
       <script>
         // Current page data
         var mkdocs_page_name = "Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles";
-        var mkdocs_page_input_path = "index_old.md";
+        var mkdocs_page_input_path = "old/index_old.md";
         var mkdocs_page_url = null;
       </script>
     
-    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <script src="../../js/jquery-3.6.0.min.js" defer></script>
     <!--[if lt IE 9]>
-      <script src="../js/html5shiv.min.js"></script>
+      <script src="../../js/html5shiv.min.js"></script>
     <![endif]-->
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
@@ -34,21 +34,17 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href=".." class="icon icon-home"> FASTEL Documentation
+          <a href="../.." class="icon icon-home"> FASTEL Documentation
         </a>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../fastel/">FASTEL</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../tutorial/">Tutorial</a>
+                <li class="toctree-l1"><a class="reference internal" href="../../background/">Contributions</a>
                 </li>
               </ul>
       </div>
@@ -58,13 +54,13 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="..">FASTEL Documentation</a>
+          <a href="../..">FASTEL Documentation</a>
         
       </nav>
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+    <li><a href="../.." class="icon icon-home" alt="Docs"></a> &raquo;</li>
       <li>Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles</li>
     <li class="wy-breadcrumbs-aside">
     </li>
@@ -76,7 +72,7 @@
               
                 <h1 id="flexible-modeling-and-multitask-learning-using-differentiable-tree-ensembles">Flexible Modeling and Multitask Learning using Differentiable Tree Ensembles</h1>
 <p><strong> Authors: Shibal Ibrahim, Hussein Hazimeh, Rahul Mazumder </strong></p>
-<p>This site provides an introduction to FASTEL, a new toolkit for learning differentiable tree ensembles <a href="https://dl.acm.org/doi/pdf/10.1145/3534678.3539412">2022, Ibrahim, Hazimeh and Mazumder</a>. An introduction to differentiable tree ensembles can be found below. To dive in, a code tutorial can be found in the <a href="../tutorial/">Tutorial Section</a>. </p>
+<p>This site provides an introduction to FASTEL, a new toolkit for learning differentiable tree ensembles <a href="https://dl.acm.org/doi/pdf/10.1145/3534678.3539412">2022, Ibrahim, Hazimeh and Mazumder</a>. An introduction to differentiable tree ensembles can be found below. To dive in, a code tutorial can be found in the <a href="tutorial.md">Tutorial Section</a>. </p>
 <p>Our contributions, which can be summarized as follows, are:</p>
 <ul>
 <li>Proposition of a flexible framework for training differentiable tree ensembles with seamless support for new loss functions.</li>
@@ -84,7 +80,7 @@
 <li>Extension of differentiable tree ensembles to multi-task learning settings by introducing a new regularizer that allows for soft parameter sharing across tasks.</li>
 <li>Introduction of FASTEL — a new toolkit (based on Tensorflow 2.0) for learning differentiable tree ensembles</li>
 </ul>
-<p>To have more details about our countributions, please visit <a href="../fastel/">Fastel</a>. </p>
+<p>To have more details about our countributions, please visit <a href="fastel.md">Fastel</a>. </p>
 <h2 id="introduction-to-differentiable-tree-ensembles">Introduction to differentiable tree ensembles</h2>
 <p>We learn an ensemble of m differentiable trees. Let  <span class="arithmatex">\(f^j\)</span> be the <span class="arithmatex">\(j\)</span> th tree in the ensemble. For easier exposition, we consider a single-task regression or classification setting—see Section 5 for an extension to the multi-task setting. In a regression setting <span class="arithmatex">\(k=1\)</span>, while in multi-class classification setting <span class="arithmatex">\(k = C\)</span>, where <span class="arithmatex">\(C\)</span> is the number of classes. For an input feature-vector <span class="arithmatex">\(x \in \mathbb{R}^p\)</span> , we learn an additive model with the output being sum over outputs of all the trees:</p>
 <div class="arithmatex">\[\begin{equation}
@@ -115,7 +111,7 @@ f^j(x) = \sum_{l \in L} P^j(\{x → l\}) o_l^j
 <li>With a careful implementation, the tree ensemble can be trained efficiently on GPUs — this is not possible with earlier toolkits such as TEL.</li>
 <li>Differentiable trees can lead to more expressive and compact ensembles. This can have important implications for interpretability, latency and storage requirements during inference.</li>
 </ol>
-<p>This is the framework implemented in the FASTEL package. To see it in action, the tutorial can be found <a href="../tutorial/">here</a>. </p>
+<p>This is the framework implemented in the FASTEL package. To see it in action, the tutorial can be found <a href="tutorial.md">here</a>. </p>
               
             </div>
           </div><footer>
@@ -143,10 +139,10 @@ f^j(x) = \sum_{l \in L} P^j(\{x → l\}) o_l^j
     
   </span>
 </div>
-    <script>var base_url = '..';</script>
-    <script src="../js/theme_extra.js" defer></script>
-    <script src="../js/theme.js" defer></script>
-      <script src="../javascripts/config.js" defer></script>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme_extra.js" defer></script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../javascripts/config.js" defer></script>
       <script src="https://polyfill.io/v3/polyfill.min.js?features=es6" defer></script>
       <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" defer></script>
     <script defer>

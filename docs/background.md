@@ -32,7 +32,7 @@ Internal (split) nodes in a differentiable tree perform soft routing, where a sa
 
 ### Differentiable tree ensembles
 
-We learn an ensemble of m differentiable trees. Let  $f^j$ be the $j$ th tree in the ensemble. For easier exposition, we consider a single-task regression.
+We learn an ensemble of m differentiable trees. Let $f^j$ be the $j$ th tree in the ensemble. For easier exposition, we consider a single-task regression.
 For an input feature-vector $x \in \mathbb{R}^p$ , we learn an additive model with the output being sum over outputs of all the trees:
 
 \begin{equation}
@@ -71,7 +71,7 @@ Current differentiable tree ensemble proposals and toolkits model trees individu
   <figcaption> <span style="font-size:0.7em;">Classical formulations for Soft Tree ensembles model trees individually</span>  </figcaption>
 </figure>
 
-In that context, we model the internal nodes in the trees across the ensemble jointly as a “supernodes”. More details on the tensor formulation can be found in the [paper](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412), section 3.2.
+In that context, we model the internal nodes in the trees across the ensemble jointly as a **“supernodes”**. More details on the tensor formulation can be found in the [paper](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412), section 3.2.
 
 <figure align="middle">
   <img src="../img/fastel/efficientvector.png" width="700" />
@@ -86,19 +86,22 @@ More details on the flexible loss functions can be found in the [paper](https://
 
 #### Zero-inflated Poisson Regression
 
-As described above, our model can be usef with any differentiable loss function. In this example, we show how to use our framework to learn a zero-inflated Poisson regression model. 
-Zero-inflation occurs in many applications, e.g., understanding alcohol and drug abuse in young adults, characterizing undercoverage and overcoverage to gauge the on-going quality of the census frames, studying popularity of news items on different social media platforms, financial services applications etc. Despite the prevalence of these applications, there has been limited work on building decision tree-based approaches for zero-inflated data perhaps due to a lack of support public toolkits. Therefore, practitioners either resort to Poisson regression with trees or simpler linear models to handle zero-inflated responses. A Poisson model can lead to sub-optimal performance due to the limiting equidispersion constraint (mean equals the variance). Others take a two-stage approach, where a classification model distinguishes the zero and non-zero and a second model is used to model the non-zero responses. This can be sup-optimal as errors in the first model can deteriorate the performance of the second model. We employ a more well-grounded approach by formulating the joint mixture model, where one part of the model tries to learn the mixture proportions (zero vs non-zero) and the other part models the actual non-zero responses. Such a mixture model permits a differentiable loss function when both components of the model are parameterized with differentiable tree ensembles and can be optimized with gradient descent method in an end-to-end fashion without the need for a custom solver. We provide an extensive study with our framework on small to large-scale real world zero-inflated datasets and demonstrate that such flexibility in distribution modeling can lead to significantly more compact and expressive tree ensembles. This has large implications for faster inference, storage requirements and interpretability.
+As described above, our model can be used with **any differentiable loss function**. In this example, we show how to use our framework to learn a zero-inflated Poisson regression model. 
+**Zero-inflation** occurs in many applications, e.g., understanding alcohol and drug abuse in young adults, characterizing undercoverage and overcoverage to gauge the on-going quality of the census frames, studying popularity of news items on different social media platforms, financial services applications etc. 
+Despite the prevalence of these applications, there has been limited work on building decision tree-based approaches for zero-inflated data perhaps due to a lack of support public toolkits. Therefore, practitioners either resort to Poisson regression with trees or simpler linear models to handle zero-inflated responses, which can lead to **sub-optimal performance**. 
+
+In our work, we employ a more well-grounded approach by formulating the joint mixture model, where one part of the model tries to **learn the mixture proportions** (zero vs non-zero) and the other part **models the actual non-zero responses**. Such a mixture model permits a differentiable loss function when both components of the model are parameterized with differentiable tree ensembles and can be optimized with gradient descent method in an end-to-end fashion without the need for a custom solver. We provide an extensive study in the [paper](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412) on the performance of our model compared to other approaches.
 
 ### Multi-task learning with tree ensembles
 
 Multi-task Learning (MTL) aims to learn multiple tasks simultaneously by using a shared model. Unlike single task learning, MTL can achieve better generalization performance through exploiting task relationships.
-One key problem in MTL is how to share model parameters between tasks.
+**One key problem in MTL is how to share model parameters between tasks.**
 For instance, sharing parameters between unrelated tasks can potentially degrade performance. MTL approaches for classical decision trees approaches e.g., RF, GRF have shared weights at the splitting nodes across the tasks.
 Only the leaf weights are task specific. 
 However this can be limiting in terms of performance, despite easier interpretability associated with the same split nodes across tasks.
 
 
-To perform flexible multi-task learning, we extend our [efficient tensor formulation](#efficient-tensor-formulation) by using task-specific nodes in the tree ensemble. This is intensively studied in the [paper](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412), section 5.
+To perform flexible multi-task learning, we extend our [efficient tensor formulation](#efficient-tensor-formulation) by using **task-specific nodes in the tree ensemble**. This is intensively studied in the [paper](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412), section 5.
 
 <figure align="middle">
   <img src="../img/fastel/multitask.png" width="700" />
@@ -108,6 +111,6 @@ To perform flexible multi-task learning, we extend our [efficient tensor formula
 
 ### Results
 
-Experiments performed on a collection of 28 open-source and real-world datasets, demonstrated that our new FASTEL toolkit can lead to 100x more compact ensembles and up to 23% improvement in out-of-sample performance, compared to tree ensembles learnt by popular toolkits such as XGBoost, as described in the [here, section 6](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412)
+Experiments performed on a collection of 28 open-source and real-world datasets, demonstrated that our new FASTEL toolkit can lead to **100x more compact ensembles and up to 23% improvement in out-of-sample performance**, compared to tree ensembles learnt by popular toolkits such as XGBoost, as described in the [here, section 6](https://dl.acm.org/doi/pdf/10.1145/3534678.3539412)
 
 
